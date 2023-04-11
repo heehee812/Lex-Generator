@@ -31,6 +31,7 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 {float}    { printf("#float:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {operator}    { printf("#op:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {punctuation}    { printf("#punc:%s\n", yytext); strcpy(command+strlen(command), yytext); }
+"//".*    { strcpy(command+strlen(command), yytext); }
 "/*"    { BEGIN CMNT; strcpy(command+strlen(command), yytext); }
 <CMNT>.    { strcpy(command+strlen(command), yytext); }
 <CMNT>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
