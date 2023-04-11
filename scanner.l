@@ -17,7 +17,8 @@ float    [+/-]?(([[:digit:]]+\.[[:digit:]]*)|(\.[[:digit:]]+))
 operator    ([+][+]?)|([-][-]?)|([|][|]?)|([&][&]?)|([=][=]?)|([!][=]?)|([<][=]?)|([>][=]?)|[*%\/]
 punctuation    [:\;,\.\[\]\(\)\{\}]
 %x    CMNT
-%x    PRAG
+%x    PRAGTOKEN
+%x    PRAGSOURCE
 
 %%
 \n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command));}
@@ -37,13 +38,24 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 <CMNT>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
 <CMNT>"*/"    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
 "#pragma"[ \t]+("source"|"token")[ \t]+"on"[ \t]*    { strcpy(command+strlen(command), yytext); }
-"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*\n    { memset(command, 0, sizeof(command)); }
-"#pragma"[ \t]+"token"[ \t]+"off"[ \t]*    {BEGIN PRAG; strcpy(command+strlen(command), yytext); }
-<PRAG>{ws}|{keyword}|{macro}|{identifier}|{char}|{string}|{integer}|{float}|{operator}|{punctuation}    { strcpy(command+strlen(command), yytext); }
-<PRAG>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
-<PRAG>"#pragma"[ \t]+"source"|[ \t]+"on"[ \t]*    { strcpy(command+strlen(command), yytext); }
-<PRAG>"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*\n    { memset(command, 0, sizeof(command)); }
-<PRAG>"#pragma"[ \t]+"token"[ \t]+"on"[ \t]*    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
+"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*    { BEGIN PRAGSOURCE; }    
+<PRAGSOURCE>\n|{ws}    ;
+<PRAGSOURCE>{keyword}    { printf("#key:%s\n", yytext); }
+<PRAGSOURCE>{macro}    { printf("#macro:%s\n", yytext); }
+<PRAGSOURCE>{identifier}    { printf("#id:%s\n", yytext); }
+<PRAGSOURCE>{char}    { printf("#char:%s\n", yytext); }
+<PRAGSOURCE>{string}    { printf("#string:%s\n", yytext); }
+<PRAGSOURCE>{integer}    { printf("#integer:%s\n", yytext); }
+<PRAGSOURCE>{float}    { printf("#float:%s\n", yytext); }
+<PRAGSOURCE>{operator}    { printf("#op:%s\n", yytext); }
+<PRAGSOURCE>{punctuation}    { printf("#punc:%s\n", yytext); }
+<PRAGSOURCE>"#pragma"[ \t]+"source"[ \t]+"on"[ \t]*    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
+"#pragma"[ \t]+"token"[ \t]+"off"[ \t]*    { BEGIN PRAGTOKEN; strcpy(command+strlen(command), yytext); }
+<PRAGTOKEN>{ws}|{keyword}|{macro}|{identifier}|{char}|{string}|{integer}|{float}|{operator}|{punctuation}    { strcpy(command+strlen(command), yytext); }
+<PRAGTOKEN>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
+<PRAGTOKEN>"#pragma"[ \t]+"source"|[ \t]+"on"[ \t]*    { strcpy(command+strlen(command), yytext); }
+<PRAGTOKEN>"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*\n    { memset(command, 0, sizeof(command)); }
+<PRAGTOKEN>"#pragma"[ \t]+"token"[ \t]+"on"[ \t]*    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
 .    { printf("error"); exit(1); }
 
 %%
