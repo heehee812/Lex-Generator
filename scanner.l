@@ -6,13 +6,14 @@ char command[299];
 
 %}
 
-ws    [ /t]+
+ws    [ \t]+
+keyword    "for"|"do"|"while"|"break"|"continue"|"if"|"else"|"return"|"struct"|"switch"|"case"|"default"|"void"|"int"|"double"|"float"|"char"|"const"|"signed"|"unsigned"|"short"|"long"
 
 %%
-{ws} ;
-\n {++num_lines ;printf("%s\n", command);}
-([[:alpha:]]|[ ])* {strcpy(command, yytext);}
-
+\n { ++num_lines; printf("%d:%s\n", num_lines, command); }
+{ws} { strcpy(command+strlen(command), yytext); }
+{keyword} { printf("#key:%s\n", yytext); strcpy(command+strlen(command), yytext); }
+. ;
 %%
 
 int main(int argc , char* argv[])
