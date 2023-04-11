@@ -23,8 +23,8 @@ minuszero    "-0."0*
 {identifier}    { printf("#id:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {char}    { printf("#char:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {string}    { printf("#string:%s\n", yytext); strcpy(command+strlen(command), yytext); }
-{integer}    { if(yytext[0] == '-' && atoi(yytext) == 0) printf("#op:-\n#int:0\n"); else {printf("#int:%d\n", atoi(yytext)); strcpy(command+strlen(command), yytext);} }
-{minuszero}    { printf("#op:-\n#float:%f\n", atof(yytext)); }
+{integer}    { if(yytext[0] == '-' && atoi(yytext) == 0) printf("#op:-\n#int:0\n"); else printf("#int:%d\n", atoi(yytext)); strcpy(command+strlen(command), yytext); }
+{minuszero}    { printf("#op:-\n#float:%f\n", atof(yytext)); strcpy(command+strlen(command), yytext);}
 .    ;
 %%
 
