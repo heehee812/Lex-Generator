@@ -52,6 +52,5 @@ int main(int argc , char* argv[])
         yyin = stdin ;
     }
     yylex();
-    printf("# of lines = %d, # of chars = %d\n", num_lines, nums_chars) ;
     return 0;
 }
