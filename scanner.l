@@ -37,7 +37,7 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 <CMNT>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
 <CMNT>"*/"    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
 "#pragma"[ \t]+("source"|"token")[ \t]+"on"[ \t]*    { strcpy(command+strlen(command), yytext); printf("%d:%s\n", num_lines, command); }
-"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*    { memset(command, 0, sizeof(command)); }
+"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*\n    { memset(command, 0, sizeof(command)); }
 "#pragma"[ \t]+"token"[ \t]+"off"[ \t]*    {BEGIN PRAG; strcpy(command+strlen(command), yytext); }
 <PRAG>{ws}|{keyword}|{macro}|{identifier}|{char}|{string}|{integer}|{float}|{operator}|{punctuation}    { strcpy(command+strlen(command), yytext); }
 <PRAG>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
