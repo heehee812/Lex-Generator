@@ -17,6 +17,7 @@ minuszero    "-0."0*
 float    [+/-]?(([[:digit:]]+\.[[:digit:]]*)|(\.[[:digit:]]+))
 operator    ([+][+]?)|([-][-]?)|([|][|]?)|([&][&]?)|([=][=]?)|([!][=]?)|([<][=]?)|([>][=]?)|[*%]
 punctuation    [:\;,\.\[\]\(\)\{\}]
+%x  CMNT
 
 %%
 \n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command));}
@@ -26,12 +27,16 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 {identifier}    { printf("#id:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {char}    { printf("#char:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {string}    { printf("#string:%s\n", yytext); strcpy(command+strlen(command), yytext); }
-{integer}    { if(yytext[0] == '-' && atoi(yytext) == 0) printf("#op:-\n#integer:0\n"); else printf("#integer:%d\n", atoi(yytext)); strcpy(command+strlen(command), yytext); }
+{integer}    { if(yytext[0] == '-' && atoi(yytext) == 0) printf("#op:-\n#integer:0\n"); else printf("#integer:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {minuszero}    { printf("#op:-\n#float:%f\n", atof(yytext)); strcpy(command+strlen(command), yytext);}
-{float}    { printf("#float:%f\n", atof(yytext)); strcpy(command+strlen(command), yytext); }
+{float}    { printf("#float:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {operator}    { printf("#op:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {punctuation}    { printf("#punc:%s\n", yytext); strcpy(command+strlen(command), yytext); }
-.    ;
+"/*"    { BEGIN CMNT; strcpy(command+strlen(command), yytext); }
+<CMNT>.    { strcpy(command+strlen(command), yytext); }
+<CMNT>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
+<CMNT>"*/"    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
+.    { printf("error"); exit(1); }
 %%
 
 int main(int argc , char* argv[])
