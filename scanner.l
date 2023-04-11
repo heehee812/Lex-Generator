@@ -14,6 +14,7 @@ char    '.'
 string    \".*\"
 integer    ([+/-]?[0-9]+)
 minuszero    "-0."0*
+float    [+/-]?(([[:digit:]]+\.[[:digit:]]*)|(\.[[:digit:]]+))
 
 %%
 \n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command));}
@@ -25,6 +26,7 @@ minuszero    "-0."0*
 {string}    { printf("#string:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {integer}    { if(yytext[0] == '-' && atoi(yytext) == 0) printf("#op:-\n#int:0\n"); else printf("#int:%d\n", atoi(yytext)); strcpy(command+strlen(command), yytext); }
 {minuszero}    { printf("#op:-\n#float:%f\n", atof(yytext)); strcpy(command+strlen(command), yytext);}
+{float}    { printf("#float:%f\n", atof(yytext)); strcpy(command+strlen(command), yytext); }
 .    ;
 %%
 
