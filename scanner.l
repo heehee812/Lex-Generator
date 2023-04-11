@@ -13,7 +13,6 @@ identifier    ([[:alpha:]]|\_)([[:alnum:]]|\_)*
 char    '.'
 string    \".*\"
 integer    ([+/-]?[0-9]+)
-minuszero    "-0."0*
 float    [+/-]?(([[:digit:]]+\.[[:digit:]]*)|(\.[[:digit:]]+))
 operator    ([+][+]?)|([-][-]?)|([|][|]?)|([&][&]?)|([=][=]?)|([!][=]?)|([<][=]?)|([>][=]?)|[*%]
 punctuation    [:\;,\.\[\]\(\)\{\}]
@@ -28,8 +27,7 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 {identifier}    { printf("#id:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {char}    { printf("#char:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {string}    { printf("#string:%s\n", yytext); strcpy(command+strlen(command), yytext); }
-{integer}    { if(yytext[0] == '-' && atoi(yytext) == 0) printf("#op:-\n#integer:0\n"); else printf("#integer:%s\n", yytext); strcpy(command+strlen(command), yytext); }
-{minuszero}    { printf("#op:-\n#float:%f\n", atof(yytext)); strcpy(command+strlen(command), yytext);}
+{integer}    { printf("#integer:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {float}    { printf("#float:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {operator}    { printf("#op:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {punctuation}    { printf("#punc:%s\n", yytext); strcpy(command+strlen(command), yytext); }
@@ -40,7 +38,7 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 "#pragma"[ \t]+("source"|"token")[ \t]+"on"[ \t]*    { strcpy(command+strlen(command), yytext); printf("%d:%s\n", num_lines, command); }
 "#pragma"[ \t]+"source"[ \t]+"off"[ \t]*    { memset(command, 0, sizeof(command)); }
 "#pragma"[ \t]+"token"[ \t]+"off"[ \t]*    {BEGIN PRAG; strcpy(command+strlen(command), yytext); }
-<PRAG>{ws}|{keyword}|{macro}|{identifier}|{char}|{string}|{integer}|{minuszero}|{float}|{operator}|{punctuation}    { strcpy(command+strlen(command), yytext); }
+<PRAG>{ws}|{keyword}|{macro}|{identifier}|{char}|{string}|{integer}|{float}|{operator}|{punctuation}    { strcpy(command+strlen(command), yytext); }
 <PRAG>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
 <PRAG>"#pragma"[ \t]+"token"[ \t]+"on"[ \t]*    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
 .    { printf("error"); exit(1); }
