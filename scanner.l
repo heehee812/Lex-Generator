@@ -22,7 +22,7 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 
 %%
 \n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command));}
-{ws}    { strcpy(command+strlen(command), yytext); }
+{ws}    { if(command[0] == 0); else strcpy(command+strlen(command), yytext); }
 {keyword}    { printf("#key:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {macro}    { printf("#macro:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {identifier}    { printf("#id:%s\n", yytext); strcpy(command+strlen(command), yytext); }
