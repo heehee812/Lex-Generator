@@ -10,8 +10,8 @@ ws    [ \t]+
 keyword    "for"|"do"|"while"|"break"|"continue"|"if"|"else"|"return"|"struct"|"switch"|"case"|"default"|"void"|"int"|"double"|"float"|"char"|"const"|"signed"|"unsigned"|"short"|"long"
 macro    "NULL"|"__COUNTER__"|"__LINE__"|"INT_MAX"|"INT_MIN"|"CHAR_MAX"|"CHAR_MIN"|"MAX"|"MIN"
 identifier    ([[:alpha:]]|\_)([[:alnum:]]|\_)*
-char    ('.')|('([\\]([abefnrtv\\'\"\?]|([0-7][0-7]?[0-7]?)|(x[0-7]+)|(u[0-9A-F][0-9A-F][0-9A-F][0-9A-F])|(U[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F])))')
-string    \".*\"
+char    ('.')|('([\\]([abefnrtv\\'\"\?]|([0-7][0-7]?[0-7]?)|(x[0-9A-Fa-f]+)|(u[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])|(U[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])))')
+string    \"[^\"]*\"
 integer    ([+/-]?[0-9]+)
 float    [+/-]?(([[:digit:]]+\.[[:digit:]]*)|(\.[[:digit:]]+))
 operator    ([+][+]?)|([-][-]?)|([|][|]?)|([&][&]?)|([=][=]?)|([!][=]?)|([<][=]?)|([>][=]?)|[*%\/]
@@ -50,7 +50,7 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 <SOURCETOKENOFF>{ws}|{keyword}|{macro}|{identifier}|{char}|{string}|{integer}|{float}|{operator}|{punctuation}|("//".*)|("/*"[.|\n]*"*/")    ;
 <SOURCETOKENOFF>"#pragma"[ \t]+"token"[ \t]+"on"[ \t]*    { BEGIN SOURCEOFF; strcpy(command+strlen(command), yytext); }
 <SOURCETOKENOFF>"#pragma"[ \t]+"source"[ \t]+"on"[ \t]*    { BEGIN TOKENOFF; strcpy(command+strlen(command), yytext); }
-<SOURCEOFF>{ws}|("//".*)|("/*"[.|\n]*"*/")    ;
+<SOURCEOFF>{ws}|("//".*)|("/*"[.|\n]*"*/")|("#pragma"[ \t]+"token"[ \t]+"on"[ \t]*)    ;
 <SOURCEOFF>{keyword}    { printf("#key:%s\n", yytext); }
 <SOURCEOFF>{macro}    { printf("#macro:%s\n", yytext); }
 <SOURCEOFF>{identifier}    { printf("#id:%s\n", yytext); }
