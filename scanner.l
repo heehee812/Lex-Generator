@@ -42,8 +42,8 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 <CMNT>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
 <CMNT>"*/"    { BEGIN INITIAL; strcpy(command+strlen(command), yytext); }
 "#pragma"[ \t]+("source"|"token")[ \t]+"on"[ \t]*    { strcpy(command+strlen(command), yytext); }
-"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*    { BEGIN PRAGSOURCE; }    
-<PRAGSOURCE>\n|{ws}    ;
+"#pragma"[ \t]+"source"[ \t]+"off"[ \t]*    { BEGIN PRAGSOURCE; }
+<PRAGSOURCE>\n|{ws}|("//".*)|("/*"[.|\n]*"*/")    ;
 <PRAGSOURCE>{keyword}    { printf("#key:%s\n", yytext); }
 <PRAGSOURCE>{macro}    { printf("#macro:%s\n", yytext); }
 <PRAGSOURCE>{identifier}    { printf("#id:%s\n", yytext); }
