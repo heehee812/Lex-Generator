@@ -10,7 +10,7 @@ ws    [ \t]+
 keyword    "for"|"do"|"while"|"break"|"continue"|"if"|"else"|"return"|"struct"|"switch"|"case"|"default"|"void"|"int"|"double"|"float"|"char"|"const"|"signed"|"unsigned"|"short"|"long"
 macro    "NULL"|"__COUNTER__"|"__LINE__"|"INT_MAX"|"INT_MIN"|"CHAR_MAX"|"CHAR_MIN"|"MAX"|"MIN"
 identifier    ([[:alpha:]]|\_)([[:alnum:]]|\_)*
-char    '\\?.'
+char    ('.')|('([\\]([abefnrtv\\'\"\?]|([0-7][0-7]?[0-7]?)|(x[0-7]+)|(u[0-9A-F][0-9A-F][0-9A-F][0-9A-F])|(U[0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F][0-9A-F])))')
 string    \".*\"
 integer    ([+/-]?[0-9]+)
 float    [+/-]?(([[:digit:]]+\.[[:digit:]]*)|(\.[[:digit:]]+))
