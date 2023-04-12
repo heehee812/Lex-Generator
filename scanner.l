@@ -17,12 +17,13 @@ float    [+/-]?(([[:digit:]]+\.[[:digit:]]*)|(\.[[:digit:]]+))
 operator    ([+][+]?)|([-][-]?)|([|][|]?)|([&][&]?)|([=][=]?)|([!][=]?)|([<][=]?)|([>][=]?)|[*%\/]
 punctuation    [:\;,\.\[\]\(\)\{\}]
 %x    CMNT
+%x    CMNTEXP
 %x    PRAGTOKEN
 %x    PRAGSOURCE
 
 %%
 \n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command));}
-{ws}    { if(command[0] == 0); else strcpy(command+strlen(command), yytext); }
+{ws}    { strcpy(command+strlen(command), yytext); }
 {keyword}    { printf("#key:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {macro}    { printf("#macro:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {identifier}    { printf("#id:%s\n", yytext); strcpy(command+strlen(command), yytext); }
@@ -32,7 +33,10 @@ punctuation    [:\;,\.\[\]\(\)\{\}]
 {float}    { printf("#float:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {operator}    { printf("#op:%s\n", yytext); strcpy(command+strlen(command), yytext); }
 {punctuation}    { printf("#punc:%s\n", yytext); strcpy(command+strlen(command), yytext); }
-"//".*    { strcpy(command+strlen(command), yytext); }
+"//"    {BEGIN CMNTEXP; strcpy(command+strlen(command), yytext); }
+<CMNTEXP>\\+\n    { ++num_lines; strcpy(command+strlen(command), yytext); printf("%d:%s", num_lines, command); memset(command, 0, sizeof(command)); }
+<CMNTEXP>\n    { BEGIN INITIAL; ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
+<CMNTEXP>.    { strcpy(command+strlen(command), yytext); }
 "/*"    { BEGIN CMNT; strcpy(command+strlen(command), yytext); }
 <CMNT>.    { strcpy(command+strlen(command), yytext); }
 <CMNT>\n    { ++num_lines; printf("%d:%s\n", num_lines, command); memset(command, 0, sizeof(command)); }
